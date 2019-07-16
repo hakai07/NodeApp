@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<style type="text/css">
+		body{
+			margin:0;
+			background-image: url("images/background.jpg") ;
+			background-repeat: no-repeat;
+			background-size: cover;
+		}
+		::placeholder {
+			color:black;
+		}
+		#username
+		{
+			height:30px;
+			width: 300px;
+			border-radius: 10px;
+			font-size: 20px;
+			background:transparent;
+			color:white;
+			outline: none;
+			border-bottom: 1px solid black;
+			font-family:Comic Sans MS;
+		}
+		#btn
+		{
+			font-size:20px;
+			background-color:transparent;
+			padding:5px;
+			color:white;
+			width:200px;
+			border-radius:10px;
+			font-family:Comic Sans MS;
+		}
+		#btn:hover
+		{
+			background-color: blue;
+			cursor: pointer;
+		}
+		#messages_window
+		{
+			height: 500px;
+			width: 30%;
+			background-color: white;
+			float:right;
+			margin-top: 11%;
+			border-radius: 10%;	
+			display: none;	
+			overflow: auto;
+		}
+		#message_content
+		{
+		    margin-left: 10px;
+   			width: 80%;
+    		margin-top: 30px;
+    		font-size: 20px;
+    		background: transparent;
+    		color: black;
+    		outline: none;
+    		border: none;
+    		border-bottom: 1px solid black;
+    		font-family: Comic Sans MS;
+    		position: relative;
+		}
+		#send_btn
+		{
+			
+			width: 10%;
+    		height: 30px;
+    		font-size: 20px;
+    		background: transparent;
+    		color: black;
+    		outline: none;
+    		border: none;
+    		border-bottom: 1px solid black;
+    		position: relative;
+    		font-family: Comic Sans MS;
+    		border-radius: 50px;
+		}
+		#send_btn:hover
+		{
+			background-color: blue;
+			cursor: pointer;
+		}
+		#people
+		{
+			background-color: white;
+			height: 500px;
+			width: 30%;
+			float:right;
+			margin-top: 11%;
+			margin-right:5%;
+			border-radius: 10%;	
+			display: none;
+			overflow: auto;
+			border:1px solid red;
+			padding:10px;
+		}
+	</style>
+	<title></title>
+	<script src = "http://localhost:8081/socket.io/socket.io.js"></script>
+   		<script>
+
+   			var message,para,content,username;
+			var socket = io.connect('http://localhost:8081');
+
+   			function display_chat(){
+				username = document.getElementById('username').value;
+   				var parent = document.getElementById('messages_window');
+   				parent.style.display = "inline";
+   				var details = document.getElementById('details');
+				   details.style.display = "none";
+				var people = document.getElementById('people');
+				people.style.display = "inline";
+				   socket.emit('userOnline',{username : username});
+   			}
+
+
+      		
+
+      		function sendMessage()
+      		{
+      			username = document.getElementById('username').value;
+      			message = document.getElementById('message_content').value;
+      			socket.emit('sendMessage',{message : message,username:username});
+      		}
+      			socket.on('getMessage',function(data){	
+      			para = document.getElementById('messages_display');
+      			para.innerHTML += "<br>";
+      	 		content = document.createTextNode(data.username + " : " + data.message);
+      	 		para.appendChild(content);
+		   });
+		   socket.on('users',function(data){
+			    var parent = document.getElementById('people');
+				document.getElementById('people').innerHTML = '';
+			    for(var i = 0; i < data.users.length; i++)
+			    {	   
+					var container = document.createElement('div');	
+					var para = document.createElement('p');
+					if(data.activeUsers.indexOf(data.users[i]) == -1)
+						var content = document.createTextNode(data.users[i] + ' : Offline');
+					else
+						var content = document.createTextNode(data.users[i] + ' : Online');
+					para.appendChild(content);
+					container.appendChild(para);
+					parent.appendChild(container);
+			   }
+		   });
+      	 	
+   </script>
+</head>
+<body>
+	
+	<div id = "messages_window">
+		<input type="text" name="message" id="message_content" placeholder="send a message">
+		<button value = "send" onclick = "sendMessage()" id="send_btn">S</button><br><br>
+		<span id="messages_display" style="">
+			
+		</span>
+	</div>
+	<div id = "people">
+
+	</div>
+	<div id = "details" align = "center" style="margin-top: 20%;">
+		<input type="text" name="" id = "username" placeholder="Username"><br><br>
+		<input type = "button" value = "Submit" id = "btn" onclick="display_chat()">
+	</div>	
+</body>
+</html>
