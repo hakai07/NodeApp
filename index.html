@@ -105,6 +105,7 @@
    			var message,para,content,username;
 			var socket = io.connect('http://localhost:8081');
 
+			//FUnciton to display chat window
    			function display_chat(){
 				username = document.getElementById('username').value;
    				var parent = document.getElementById('messages_window');
@@ -131,6 +132,7 @@
       	 		content = document.createTextNode(data.username + " : " + data.message);
       	 		para.appendChild(content);
 		   });
+
 		   socket.on('users',function(data){
 			    var parent = document.getElementById('people');
 				document.getElementById('people').innerHTML = '';
